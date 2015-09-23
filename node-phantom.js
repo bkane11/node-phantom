@@ -44,11 +44,12 @@ module.exports={
 			},100);
 		}
 		
+					// var socket = new io.connect("http://" + window.location.hostname);\n\
 		var server=http.createServer(function(request,response){
 			response.writeHead(200,{"Content-Type": "text/html"});
 			response.end('<html><head><script src="/socket.io/socket.io.js" type="text/javascript"></script><script type="text/javascript">\n\
 				window.onload=function(){\n\
-					var socket = new io.connect("http://" + window.location.hostname);\n\
+					var socket = new io.connect("http://" + window.location.host);\n\
 					socket.on("cmd", function(msg){\n\
 						alert(msg);\n\
 					});\n\
@@ -175,7 +176,11 @@ module.exports={
 						case 'pageFileUploaded':
 						case 'pageSetViewportDone':
 						case 'pageEvaluatedAsync':
-							cmds[cmdId].cb(null);
+						    //  to prevent this Error: 
+						    //  Missing error handler on `socket`.
+						    //  TypeError: object is not a function
+							if (cmds[cmdId].cb && cmds[cmdId].cb instanceof Function) 
+								cmds[cmdId].cb(null);
 							delete cmds[cmdId];
 							break;
 						default:
